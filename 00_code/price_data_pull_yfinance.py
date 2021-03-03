@@ -30,6 +30,10 @@ def gethistoricalOHLC(ticker, start_date="2000-01-01", end_date=None):
     return tickerHistoricalData
 
 
+def saveHistStockData():
+    """saves a retrieved historical stock data from """
+
+
 hist = gethistoricalOHLC("POAHY")
 
 print(hist.columns)
