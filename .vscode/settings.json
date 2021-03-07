@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "C:\\Users\\phili\\.conda\\envs\\finance\\python.exe"
+    "python.pythonPath": "C:\\Users\\phili\\.conda\\envs\\finance\\python.exe",
+    "kite.codefinder.enableLineDecoration": false
 }
