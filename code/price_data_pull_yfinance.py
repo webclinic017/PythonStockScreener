@@ -85,19 +85,24 @@ def saveHistStockData(ticker, tickerDF):
         # reindex the tickerDF to be written to feather
         resultDF = tickerDF
 
-    # create a new entry and append to the masterDF
-    newEntry = {
-        "TICKER": ticker,
-        "FIRST_DATE_OHLC": first_date_of_data,
-        "LAST_DATE_OHLC": last_date_of_data,
-        "FILEPATH": filepath,
-    }
+    newEntry = pd.DataFrame(
+        {
+            "TICKER": [ticker],
+            "FIRST_DATE_OHLC": [first_date_of_data],
+            "LAST_DATE_OHLC": [last_date_of_data],
+            "FILEPATH": [filepath],
+        }
+    )
 
-    newEntry = pd.DataFrame.from_dict(newEntry)
+    # dbEntry = [ticker, ffirst_date_of_data, last_date_of_data, filepath]
+    # newEntry = pd.DataFrame(
+    #     data=dbEntry,
+    #     columns=["TICKER", "FIRST_DATE_OHLC", "LAST_DATE_OHLC", "FILEPATH"],
+    # )
     if updateFlag == True:
         masterDF = masterDF.update(newEntry)
     else:
-        masterDF = masterDF.append(newEntry)
+        masterDF = masterDF.append(newEntry, ignore_index=True)
 
     pprint(masterDF.head())
     masterDF.to_csv(pathToMasterDF, index=False)
@@ -107,9 +112,6 @@ def saveHistStockData(ticker, tickerDF):
 
     data_writen_flag = True
     return data_writen_flag
-
-
-hist = gethistoricalOHLC("POAHY")
 
 
 # masterDF = pd.DataFrame(columns=['TICKER', 'FIRST_DATE_OHLC', 'LAST_DATE_OHLC', 'FILEPATH'])
