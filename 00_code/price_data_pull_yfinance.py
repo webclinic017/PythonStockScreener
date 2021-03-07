@@ -6,7 +6,7 @@ import numpy as np
 from datetime import date
 from pathlib import Path
 
-from global_vars import dataPathToOHLC, pathToMasterDF
+from global_vars import dataPathToOHLC, pathToMasterDF, float16Cols, float32Cols
 
 
 def gethistoricalOHLC(ticker, start_date="2000-01-01", end_date=None):
@@ -25,11 +25,17 @@ def gethistoricalOHLC(ticker, start_date="2000-01-01", end_date=None):
     tickerObj = yf.Ticker(ticker)
 
     # get historical data
-    tickerHistoricalData = tickerObj.history(
-        start=start_date, end=end_date, interval="1d"
-    )
+    df = tickerObj.history(start=start_date, end=end_date, interval="1d")
 
-    return tickerHistoricalData
+    df.reset_index(inplace=True)
+    # cast column types
+    float16TypeCast = [col for col in df.columns if col in float16Cols]
+    float32TypeCast = [col for col in df.columns if col in float32Cols]
+    df["Date"] = df["Date"].dt.date
+    df[float16TypeCast] = df[float16TypeCast].astype("float16")
+    df[float32TypeCast] = df[float32TypeCast].astype("float32")
+
+    return df
 
 
 def saveHistStockData(ticker, tickerDF):
@@ -44,7 +50,7 @@ def saveHistStockData(ticker, tickerDF):
     ------
     data_writen_flag : bool
     """
-    
+
     updateFlag = False
     first_date_of_data = tickerDF.index.min()  # get first date of the data available
     last_date_of_data = tickerDF.index.max()  # get last date of the data available
@@ -54,30 +60,30 @@ def saveHistStockData(ticker, tickerDF):
     masterDF = pd.read_csv(pathToMasterDF)  # open the masterDF and update the
 
     if ticker in masterDF.TICKER.values:
-       # check if the min and max are below or above the existing entry
-       if (first_date_of_data < masterDF.FIRST_DATE_OHLC) or (last_date_of_data > masterDF.LAST_DATE_OHLC):
-            
+        # check if the min and max are below or above the existing entry
+        if (first_date_of_data < masterDF.FIRST_DATE_OHLC) or (
+            last_date_of_data > masterDF.LAST_DATE_OHLC
+        ):
+
             # load the dataframe from disk
             diskDF = pd.read_feather(filepath)
             # merge the dataframes
-            tickerDF.reset_index(inplace=True)
-            resultDF = pd.merge(tickerDF, diskDF, how='outer').drop_duplicates(subset='Date')
+            resultDF = pd.merge(tickerDF, diskDF, how="outer").drop_duplicates(
+                subset="Date"
+            )
 
             # sort the new dataframe so we are sure everything is in order
-            resultDF = resultDF.sort_values(by='Date').reset_index()
-            first_date_of_data = resultDF.Date.min()
-            last_date_of_data = resultDF.Date.max()
+            resultDF = resultDF.sort_values(by="Date").reset_index()
+            first_date_of_data = resultDF.DATE.min()
+            last_date_of_data = resultDF.DATE.max()
             updateFlag = True
-        
-        else:
             data_writen_flag = False
-        
-        return data_writen_flag
 
-    else:  
+            return data_writen_flag
+
+    else:
         # reindex the tickerDF to be written to feather
-        resultDF = tickerDF.reset_index()
-
+        resultDF = tickerDF
 
     # create a new entry and append to the masterDF
     newEntry = {
@@ -90,7 +96,7 @@ def saveHistStockData(ticker, tickerDF):
     newEntry = pd.DataFrame.from_dict(newEntry)
     if updateFlag == True:
         masterDF = masterDF.update(newEntry)
-    else: 
+    else:
         masterDF = masterDF.append(newEntry)
 
     pprint(masterDF.head())
