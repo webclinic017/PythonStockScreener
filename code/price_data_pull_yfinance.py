@@ -100,7 +100,10 @@ def saveHistStockData(ticker, tickerDF):
     )
 
     if updateFlag == True:
-        masterDF = masterDF.update(newEntry)
+        print("before update")
+        masterDF.update(masterDF[["TICKER"]].merge(newEntry, "left"))
+        # masterDF.merge(newEntry, how="outer", on="TICKER")
+        print("updated")
     else:
         masterDF = masterDF.append(newEntry, ignore_index=True)
 
@@ -110,6 +113,7 @@ def saveHistStockData(ticker, tickerDF):
     resultDF.to_feather(filepath)
 
     data_writen_flag = True
+    updateFlag = False
     return data_writen_flag
 
 
@@ -118,7 +122,7 @@ masterDF = pd.DataFrame(
 )
 masterDF.to_csv(pathToMasterDF, index=False)
 
-h_MSFT = gethistoricalOHLC("MSFT")
+h_MSFT = gethistoricalOHLC("MSFT", end_date="2018-12-31")
 h_AAPL_short = gethistoricalOHLC("AAPL", end_date="2015-12-31")
 h_AAPL_long = gethistoricalOHLC("AAPL")
 
