@@ -120,6 +120,45 @@ def saveHistStockData(ticker, tickerDF):
 masterDF = pd.DataFrame(
     columns=["TICKER", "FIRST_DATE_OHLC", "LAST_DATE_OHLC", "FILEPATH"]
 )
+
+
+def loadHistDataFromDisk(
+    ticker, database=None, pathToDF=pathToMasterDF, online_search=True
+):
+    """tries to load data from disk, if available.
+    In case it does not work, it tries to pull the data from yahoo finance.
+    Full docu to be written"""
+    # TODO #4
+
+    assert isinstance(
+        ticker, str
+    ), f"Ticker should be a string but is actually of type {type(ticker)}"
+
+    if database is None:
+        try:
+            database = pd.read_csv(pathToMasterDF)
+        except:
+            print(
+                f"could not open the database dataframe. Looking for a csv under the file location {pathToDF}"
+            )
+
+    if ticker in database["TICKER"].values:
+
+        pathToFile = database.loc[database["TICKER"] == "AAPL", "FILEPATH"].values[0]
+
+        tickerDF = pd.read_feather(pathToFile)
+    else:
+        print("Could not find the files you requested!")
+        if online_search == True:
+            print("Try pulling the data from yfinance!")
+            try:
+                tickerDF = gethistoricalOHLC(ticker)
+            except:
+                print("Could not load the data from yfinance!")
+    tickerDF['Date'] = pd.to_datetime(tickerDF['Date'])
+    return tickerDF
+
+
 masterDF.to_csv(pathToMasterDF, index=False)
 
 h_MSFT = gethistoricalOHLC("MSFT", end_date="2018-12-31")
