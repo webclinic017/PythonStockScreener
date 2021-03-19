@@ -144,7 +144,7 @@ def loadHistDataFromDisk(
 
     if ticker in database["TICKER"].values:
 
-        pathToFile = database.loc[database["TICKER"] == "AAPL", "FILEPATH"].values[0]
+        pathToFile = database.loc[database["TICKER"] == ticker, "FILEPATH"].values[0]
 
         tickerDF = pd.read_feather(pathToFile)
     else:
@@ -155,7 +155,7 @@ def loadHistDataFromDisk(
                 tickerDF = gethistoricalOHLC(ticker)
             except:
                 print("Could not load the data from yfinance!")
-    tickerDF['Date'] = pd.to_datetime(tickerDF['Date'])
+    tickerDF["Date"] = pd.to_datetime(tickerDF["Date"])
     return tickerDF
 
 
