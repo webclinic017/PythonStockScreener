@@ -9,7 +9,7 @@ import pprint
 from global_vars import dataPathToOHLC, pathToMasterDF, float16Cols, float32Cols
 
 
-def gethistoricalOHLC(ticker, start_date=None, end_date=None):
+def gethistoricalOHLC(ticker, start_date='1990-01-01', end_date=None):
     """finds a ticker and its representative OHLC data from yahoo finance.
     Returns a pandas dataframe"""
 
@@ -23,18 +23,22 @@ def gethistoricalOHLC(ticker, start_date=None, end_date=None):
 
     # instantiate the yf obj
     tickerObj = yf.Ticker(ticker)
-
+    
     # get historical data
     df = tickerObj.history(start=start_date, end=end_date, interval="1d")
+    
+    if df.shape[0] > 0:
 
-    df.reset_index(inplace=True)
-    # cast column types
-    float16TypeCast = [col for col in df.columns if col in float16Cols]
-    float32TypeCast = [col for col in df.columns if col in float32Cols]
-    df["Date"] = df["Date"].dt.date
-    df[float16TypeCast] = df[float16TypeCast].astype("float16")
-    df[float32TypeCast] = df[float32TypeCast].astype("float32")
-
+        try:
+            df.reset_index(inplace=True)
+            # cast column types
+            float16TypeCast = [col for col in df.columns if col in float16Cols]
+            float32TypeCast = [col for col in df.columns if col in float32Cols]
+            df["Date"] = df["Date"].dt.date
+            df[float16TypeCast] = df[float16TypeCast].astype("float16")
+            df[float32TypeCast] = df[float32TypeCast].astype("float32")
+        except:
+            print(f'something went wrong with ticker {ticker}.')
     return df
 
 
@@ -159,20 +163,20 @@ def loadHistDataFromDisk(
     return tickerDF
 
 
-masterDF.to_csv(pathToMasterDF, index=False)
+# masterDF.to_csv(pathToMasterDF, index=False)
 
-h_MSFT = gethistoricalOHLC("MSFT", end_date="2018-12-31")
-h_AAPL_short = gethistoricalOHLC("AAPL", end_date="2015-12-31")
-h_AAPL_long = gethistoricalOHLC("AAPL")
+# h_MSFT = gethistoricalOHLC("MSFT", end_date="2018-12-31")
+# h_AAPL_short = gethistoricalOHLC("AAPL", end_date="2015-12-31")
+# h_AAPL_long = gethistoricalOHLC("AAPL")
 
-saveHistStockData("MSFT", h_MSFT)
-saveHistStockData("AAPL", h_AAPL_short)
-test = pd.read_csv(pathToMasterDF)
-print(test.head())
-saveHistStockData("AAPL", h_AAPL_long)
+# saveHistStockData("MSFT", h_MSFT)
+# saveHistStockData("AAPL", h_AAPL_short)
+# test = pd.read_csv(pathToMasterDF)
+# print(test.head())
+# saveHistStockData("AAPL", h_AAPL_long)
 
-test = pd.read_csv(pathToMasterDF)
-print(test.head())
+# test = pd.read_csv(pathToMasterDF)
+# print(test.head())
 
 
 # masterDF = pd.DataFrame(columns=['TICKER', 'FIRST_DATE_OHLC', 'LAST_DATE_OHLC', 'FILEPATH'])
