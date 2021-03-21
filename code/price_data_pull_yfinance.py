@@ -9,7 +9,7 @@ import pprint
 from global_vars import dataPathToOHLC, pathToMasterDF, float16Cols, float32Cols
 
 
-def gethistoricalOHLC(ticker, start_date="2000-01-01", end_date=None):
+def gethistoricalOHLC(ticker, start_date=None, end_date=None):
     """finds a ticker and its representative OHLC data from yahoo finance.
     Returns a pandas dataframe"""
 
@@ -100,10 +100,10 @@ def saveHistStockData(ticker, tickerDF):
     )
 
     if updateFlag == True:
-        print("before update")
+        # print("before update")
         masterDF.update(masterDF[["TICKER"]].merge(newEntry, "left"))
         # masterDF.merge(newEntry, how="outer", on="TICKER")
-        print("updated")
+        # print("updated")
     else:
         masterDF = masterDF.append(newEntry, ignore_index=True)
 
