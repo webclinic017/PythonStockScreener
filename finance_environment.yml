@@ -30,7 +30,7 @@ dependencies:
   - backcall=0.2.0=pyhd3eb1b0_0
   - base58=2.1.0=pyhd8ed1ab_0
   - bcrypt=3.2.0=py38he774522_0
-  - black=19.10b0=py_0
+  - black=20.8b1=py_1
   - blas=1.0=mkl
   - bleach=3.3.0=pyhd3eb1b0_0
   - blinker=1.4=py_1
@@ -50,6 +50,7 @@ dependencies:
   - colorama=0.4.4=pyhd3eb1b0_0
   - cryptography=3.3.1=py38hcd4344a_1
   - cycler=0.10.0=py38_0
+  - dataclasses=0.7=pyhb2cacf7_7
   - decorator=4.4.2=pyhd3eb1b0_0
   - defusedxml=0.6.0=pyhd3eb1b0_0
   - diff-match-patch=20200713=py_0
